@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon index",
-    "prod": "NODE_ENV=production  index",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js",
+    "devStart":"nodemon index.js"
+   
   },
   "author": "Ismayel Hossen",
   "license": "ISC",
