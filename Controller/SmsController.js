@@ -14,12 +14,13 @@ SmsRoute.get("/sendmsms", async function (req, res, next) {
   const otp = Math.floor(Math.random(100, 100000) * 100);
   const from = "Yumitto(OTP)";
   const to = "8801323673048";
-  const text = `This your mobile verification code`;
+  const text = `This your mobile `;
 
   vonage.message.sendSms(from, to, text, (err, responseData) => {
     if (err) {
       console.log(err);
     } else {
+      console.log(responseData)
       if (responseData.messages[0]["status"] === "0") {
         // console.log("Message sent successfully.");
         res.status(200).json({

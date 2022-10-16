@@ -433,5 +433,23 @@ ProductRoute.get("/order/confirm/:orderid", async function (req, res, next) {
     data: result,
   });
 });
+ProductRoute.get("/countorder/get", async function (req, res, next) {
+  const sql = `select*from orders where not status=1 `;
+  const result = await SqlExecuteFuncion(sql);
+  // console.log(result);
+  return res.status(200).json({
+    success: true,
+    data: result,
+  });
+});
+ProductRoute.get("/councustomer/get", async function (req, res, next) {
+  const sql = `select*from customers where status=1 `;
+  const result = await SqlExecuteFuncion(sql);
+  // console.log(result);
+  return res.status(200).json({
+    success: true,
+    data: result,
+  });
+});
 
 module.exports = ProductRoute;
