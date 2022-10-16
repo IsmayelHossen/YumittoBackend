@@ -11,7 +11,7 @@ const FrontendRoute = require("./Controller/FrontendController");
 const LoginRegisterRoute = require("./Controller/LoginRegisterController");
 const PaymentRoute = require("./Controller/PaymentController");
 const SmsRoute = require("./Controller/SmsController");
-
+const PORT = 4000;
 // parse application/x-www-form-urlencoded use it for sslecommerz
 app.use(bodyParser.urlencoded({ extended: false }));
 
