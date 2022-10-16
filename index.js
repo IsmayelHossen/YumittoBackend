@@ -1,7 +1,6 @@
 const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
-const port = 4000;
 const cors = require("cors");
 const path = require("path");
 const morgan = require("morgan");
@@ -34,6 +33,6 @@ app.use("/loginRegister", LoginRegisterRoute);
 app.use("/payment", PaymentRoute);
 app.use("/sms", SmsRoute);
 
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
+app.listen(process.env.PORT || PORT, () => {
+  console.log(`Example app listening on port ${process.env.PORT}`);
 });
