@@ -63,6 +63,74 @@ FrontendRoute.get("/productData/get/:id", async function (req, res, next) {
     data: result,
   });
 });
+
+// main search
+FrontendRoute.get(
+  "/searchproductData/get/:mainsearch",
+  async function (req, res, next) {
+    const sql = `SELECT distinct products.*,images.* from products inner join images 
+  on products.id=images.products_id where products.title like '%${req.params.mainsearch}%' OR products.price like '%${req.params.mainsearch}%'
+  OR products.brand like '%${req.params.mainsearch}%' `;
+    const result = await SqlExecuteFuncion(sql);
+    // console.log(result);
+    return res.status(200).json({
+      success: true,
+      data: result,
+    });
+  }
+);
+
+FrontendRoute.get(
+  "/subsubcategory/search/:id/:searchd",
+  async function (req, res, next) {
+    //   const sql = `SELECT  products.*,images.* from products join images
+    // on products.id=images.products_id where products.subsubcategories_id=${req.params.id} AND products.title like '%${req.params.searchd}%' or products.price like '%${req.params.searchd}%' `;
+    const sql = `SELECT  products.*,images.* from products join images 
+  on products.id=images.products_id where products.subsubcategories_id=${req.params.id} AND products.title like '%${req.params.searchd}%' or products.price like '%${req.params.searchd}%' `;
+    const result = await SqlExecuteFuncion(sql);
+    // console.log(result);
+    return res.status(200).json({
+      success: true,
+      data: result,
+    });
+  }
+);
+
+FrontendRoute.get(
+  "/filtereddata/get/:id/:filter",
+  async function (req, res, next) {
+    if (req.params.filter == "high") {
+      console.log(req.params.filter);
+      const sql = `SELECT distinct products.*,images.* from products inner join images 
+    on products.id=images.products_id where products.subsubcategories_id=${req.params.id} order by products.price desc`;
+      const result = await SqlExecuteFuncion(sql);
+      // console.log(result);
+      return res.status(200).json({
+        success: true,
+        data: result,
+      });
+    } else if (req.params.filter == "low") {
+      const sql = `SELECT distinct products.*,images.* from products inner join images 
+    on products.id=images.products_id where products.subsubcategories_id=${req.params.id} order by products.price asc`;
+      const result = await SqlExecuteFuncion(sql);
+      // console.log(result);
+      return res.status(200).json({
+        success: true,
+        data: result,
+      });
+    } else {
+      const sql = `SELECT distinct products.*,images.* from products inner join images 
+    on products.id=images.products_id where products.subsubcategories_id=${req.params.id}`;
+      const result = await SqlExecuteFuncion(sql);
+      // console.log(result);
+      return res.status(200).json({
+        success: true,
+        data: result,
+      });
+    }
+  }
+);
+
 FrontendRoute.get(
   "/singleProductData/get/:productId",
   async function (req, res, next) {
@@ -89,8 +157,8 @@ FrontendRoute.post("/cartDatasave", async function (req, res, next) {
   console.log(req.body);
 
   req.body.map(async (row, index) => {
-    const sql = `INSERT INTO cart(name,cname,subname,subsubname,model,quantity,price,coupon,coupon_discount,design_color_code,pound,orderid,cakewishname)
-  VALUES('${row.name}','${row.cname}','${row.subname}','${row.subsubname}','${row.model}','${row.quantity}','${row.price}','${row.coupon}','${row.coupon_discount}','${row.design_color_code}','${row.pound}','${row.orderid}','${row.cakewishname}')`;
+    const sql = `INSERT INTO cart(name,cname,subname,subsubname,model,quantity,price,coupon,coupon_discount,design_color_code,pound,orderid,cakewishname,UserCouponTrue,shipping)
+  VALUES('${row.name}','${row.cname}','${row.subname}','${row.subsubname}','${row.model}','${row.quantity}','${row.price}','${row.coupon}','${row.coupon_discount}','${row.design_color_code}','${row.pound}','${row.orderid}','${row.cakewishname}','${row.couponCode}','${row.shipping}')`;
     const result = await SqlExecuteFuncion(sql);
   });
   return res.status(200).json({
@@ -99,10 +167,10 @@ FrontendRoute.post("/cartDatasave", async function (req, res, next) {
 });
 FrontendRoute.post("/orderConfirm", async function (req, res, next) {
   console.log(req.body);
-  let { pay_number, pay_trxid, orderid } = req.body;
+  let { pay_number, pay_trxid, orderid, email, total_amount } = req.body;
   const time_date = new Date().toLocaleString();
-  const sql = `INSERT INTO orders(payment_method,payment_number,payment_txid,cart_orderid,timedate)
-  VALUES('Bkash','${pay_number}','${pay_trxid}','${orderid}','${time_date}')`;
+  const sql = `INSERT INTO orders(payment_method,payment_number,payment_txid,cart_orderid,timedate,email_phone,total_amount)
+  VALUES('Bkash','${pay_number}','${pay_trxid}','${orderid}','${time_date}','${email}','${total_amount}')`;
   const result = await SqlExecuteFuncion(sql);
   return res.status(200).json({
     success: true,
@@ -119,5 +187,37 @@ FrontendRoute.post("/register", async function (req, res, next) {
     success: true,
   });
 });
+
+FrontendRoute.post("/reviews", async function (req, res, next) {
+  console.log(req.body);
+  let { name, email, product_id, subsubcategories_id, review, star } = req.body;
+  const time_date = new Date().toLocaleString();
+  review = review.replace(/\'/g, " '' ");
+  const sql = `INSERT INTO  reviwes(name,email,product_id,subsubcategory_id,msg,timedate,star)
+  VALUES('${name}','${email}','${product_id}','${subsubcategories_id}','${review}','${time_date}','${star}')`;
+  const result = await SqlExecuteFuncion(sql);
+  return res.status(200).json({
+    success: true,
+  });
+});
+
+FrontendRoute.get(
+  "/singleProductDataReviws/get/:productId",
+  async function (req, res, next) {
+    console.log(req.params.productId);
+    // const sql = `SELECT products.*,images.* from products inner join images
+    // on products.id=images.products_id where products.id=${req.params.productId}`;
+
+    const sql = `SELECT*from reviwes
+     where product_id=${req.params.productId}
+  `;
+    const result = await SqlExecuteFuncion(sql);
+    // console.log(result);
+    return res.status(200).json({
+      success: true,
+      data: result,
+    });
+  }
+);
 
 module.exports = FrontendRoute;

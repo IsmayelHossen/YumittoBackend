@@ -140,7 +140,7 @@ LoginRegisterRoute.post("/login", async function (req, res, next) {
           },
           process.env.JWT_TOKEN_SECRET,
           {
-            expiresIn: 6000 * 30,
+            expiresIn: 60000 * 30,
           }
         );
         res
@@ -172,10 +172,214 @@ LoginRegisterRoute.post("/login", async function (req, res, next) {
     });
   }
 });
+LoginRegisterRoute.post("/admin/login", async function (req, res, next) {
+  const query = `SELECT*FROM admin WHERE email='${req.body.email}' `;
+  const findUser = await SqlExecuteFuncion(query);
+  console.log(findUser);
+  try {
+    if (findUser && findUser.length > 0) {
+      const isValidPassword = await bcrypt.compare(
+        req.body.password,
+        findUser[0].password
+      );
+      console.log(isValidPassword);
+      if (isValidPassword) {
+        const token = jwt.sign(
+          {
+            name: findUser[0].name,
+            Email: findUser[0].email,
+          },
+          process.env.JWT_TOKEN_SECRET,
+          {
+            expiresIn: 60000 * 30,
+          }
+        );
+        res
+          .status(200)
+          // .cookie("access_token", "Bearer " + 778, {
+          //   expires: new Date(Date.now() + 8 * 3600000), // cookie will be removed after 8 hours
+          // })
+          .json({
+            success: true,
+            access_token: token,
+            message: "Login successfully",
+            userdata: { email: findUser[0].email, name: findUser[0].name },
+          });
+      } else {
+        res.status(200).json({
+          Success1: true,
+          message: "Authentication failed user password wrong",
+        });
+      }
+    } else {
+      res.status(200).json({
+        Success1: true,
+        message: "Authentication failed user not found",
+      });
+    }
+  } catch {
+    await res.status(401).json({
+      error: "Authentication failed",
+    });
+  }
+});
+//customer social login
+
+LoginRegisterRoute.post(
+  "/customer/facebooklogin",
+  async function (req, res, next) {
+    console.log(req.body.picture.data.url);
+    const { name, email } = req.body;
+    const query = `SELECT*FROM customers WHERE email='${email}' `;
+    const findUser = await SqlExecuteFuncion(query);
+    console.log(findUser.length);
+    if (findUser.length == 0) {
+      const sql = `INSERT INTO customers(name,email)
+      VALUES('${name}','${email}')`;
+      const result = await SqlExecuteFuncion(sql);
+      const token = jwt.sign(
+        {
+          name: name,
+          Email: email,
+        },
+        process.env.JWT_TOKEN_SECRET,
+        {
+          expiresIn: 60000 * 30,
+        }
+      );
+      res.status(200).json({
+        success: true,
+        access_token: token,
+        message: "Login successfully",
+        userdata: { email: email, name: name },
+      });
+    } else {
+      const token = jwt.sign(
+        {
+          name: name,
+          Email: email,
+        },
+        process.env.JWT_TOKEN_SECRET,
+        {
+          expiresIn: 60000 * 30,
+        }
+      );
+      res.status(200).json({
+        success: true,
+        access_token: token,
+        message: "Login successfully",
+        userdata: { email: email, name: name },
+      });
+    }
+  }
+);
+LoginRegisterRoute.post(
+  "/customer/googlelogin",
+  async function (req, res, next) {
+    console.log(req.body);
+    const { name, email, imageUrl } = req.body;
+    const query = `SELECT*FROM customers WHERE email='${email}' `;
+    const findUser = await SqlExecuteFuncion(query);
+    console.log(findUser.length);
+    if (findUser.length == 0) {
+      const sql = `INSERT INTO customers(name,email,image)
+      VALUES('${name}','${email}','${imageUrl}')`;
+      const result = await SqlExecuteFuncion(sql);
+      const token = jwt.sign(
+        {
+          name: name,
+          Email: email,
+        },
+        process.env.JWT_TOKEN_SECRET,
+        {
+          expiresIn: 60000 * 30,
+        }
+      );
+      res.status(200).json({
+        success: true,
+        access_token: token,
+        message: "Login successfully",
+        userdata: { email: email, name: name },
+      });
+    } else {
+      const token = jwt.sign(
+        {
+          name: name,
+          Email: email,
+        },
+        process.env.JWT_TOKEN_SECRET,
+        {
+          expiresIn: 60000 * 30,
+        }
+      );
+      res.status(200).json({
+        success: true,
+        access_token: token,
+        message: "Login successfully",
+        userdata: { email: email, name: name },
+      });
+    }
+  }
+);
+//end customer social login
+
+LoginRegisterRoute.post(
+  "/admin/facebooklogin",
+  async function (req, res, next) {
+    console.log(req.body);
+    const { name, email } = req.body;
+    const token = jwt.sign(
+      {
+        name: name,
+        Email: email,
+      },
+      process.env.JWT_TOKEN_SECRET,
+      {
+        expiresIn: 6000 * 30,
+      }
+    );
+    res
+      .status(200)
+      // .cookie("access_token", "Bearer " + 778, {
+      //   expires: new Date(Date.now() + 8 * 3600000), // cookie will be removed after 8 hours
+      // })
+      .json({
+        success: true,
+        access_token: token,
+        message: "Login successfully",
+        userdata: { email: email, name: name },
+      });
+  }
+);
+LoginRegisterRoute.post("/admin/googlelogin", async function (req, res, next) {
+  console.log(req.body);
+  const { name, email } = req.body;
+  const token = jwt.sign(
+    {
+      name: name,
+      Email: email,
+    },
+    process.env.JWT_TOKEN_SECRET,
+    {
+      expiresIn: 6000 * 30,
+    }
+  );
+  res
+    .status(200)
+    // .cookie("access_token", "Bearer " + 778, {
+    //   expires: new Date(Date.now() + 8 * 3600000), // cookie will be removed after 8 hours
+    // })
+    .json({
+      success: true,
+      access_token: token,
+      message: "Login successfully",
+      userdata: { email: email, name: name },
+    });
+});
 
 LoginRegisterRoute.get("/userData/:email", async function (req, res, next) {
   console.log(req.params.email);
-  const sql = `SELECT name,email,address,city,region,mobile,thana from customers where email='${req.params.email}'`;
+  const sql = `SELECT image,name,email,address,city,region,mobile,thana from customers where email='${req.params.email}'`;
   const result = await SqlExecuteFuncion(sql);
   // console.log(result);
   return res.status(200).json({

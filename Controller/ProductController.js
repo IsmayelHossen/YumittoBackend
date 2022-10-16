@@ -391,4 +391,47 @@ ProductRoute.delete(
     });
   }
 );
+ProductRoute.get("/orders/get", async function (req, res, next) {
+  const sql = `SELECT* from orders where status=0`;
+
+  const result = await SqlExecuteFuncion(sql);
+  // console.log(result);
+  return res.status(200).json({
+    success: true,
+    data: result,
+  });
+});
+ProductRoute.get("/confirmorders/get", async function (req, res, next) {
+  const sql = `SELECT* from orders where status=1`;
+
+  const result = await SqlExecuteFuncion(sql);
+  // console.log(result);
+  return res.status(200).json({
+    success: true,
+    data: result,
+  });
+});
+
+ProductRoute.get(
+  "/orders/details/get/:orderid",
+  async function (req, res, next) {
+    const sql = `SELECT cart.*,orders.* from cart inner join orders on cart.orderid=orders.cart_orderid where orders.cart_orderid=${req.params.orderid} `;
+    const result = await SqlExecuteFuncion(sql);
+    // console.log(result);
+    return res.status(200).json({
+      success: true,
+      data: result,
+    });
+  }
+);
+ProductRoute.get("/order/confirm/:orderid", async function (req, res, next) {
+  const sql = `update orders set status=1 where cart_orderid=${req.params.orderid} `;
+  const result = await SqlExecuteFuncion(sql);
+  // console.log(result);
+  return res.status(200).json({
+    success: true,
+    data: result,
+  });
+});
+
 module.exports = ProductRoute;
