@@ -6,7 +6,7 @@ const bcrypt = require("bcrypt");
 const con = require("../Database/DbConnection");
 const SqlExecuteFuncion = require("../Database/QueryExecute");
 const transporter = require("../Mail/Connection");
-const is_live = false; //true for live, false for sandbox
+const is_live = false;
 
 PaymentRoute.get("/init", async function (req, res, next) {
   console.log("init ami");
