@@ -169,8 +169,11 @@ FrontendRoute.post("/orderConfirm", async function (req, res, next) {
   console.log(req.body);
   let { pay_number, pay_trxid, orderid, email, total_amount } = req.body;
   const time_date = new Date().toLocaleString();
-  const sql = `INSERT INTO orders(payment_method,payment_number,payment_txid,cart_orderid,timedate,email_phone,total_amount)
-  VALUES('Bkash','${pay_number}','${pay_trxid}','${orderid}','${time_date}','${email}','${total_amount}')`;
+  let month = new Date().toLocaleString("default", { month: "long" });
+  let year = new Date().getFullYear();
+  const month_year = month + " " + year;
+  const sql = `INSERT INTO orders(payment_method,payment_number,payment_txid,cart_orderid,timedate,email_phone,total_amount,month_year)
+  VALUES('Bkash','${pay_number}','${pay_trxid}','${orderid}','${time_date}','${email}','${total_amount}','${month_year}')`;
   const result = await SqlExecuteFuncion(sql);
   return res.status(200).json({
     success: true,

@@ -4,7 +4,7 @@ const path = require("path");
 const fs = require("fs");
 const multer = require("multer");
 const SqlExecuteFuncion = require("../Database/QueryExecute");
-
+const transporter = require("../Mail/Connection");
 //image upload functionality start
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -425,7 +425,40 @@ ProductRoute.get(
   }
 );
 ProductRoute.get("/order/confirm/:orderid", async function (req, res, next) {
+  // const toEmail = `SELECT*FROM orders where cart_orderid='${req.params.orderid}'`;
+  // const result = await SqlExecuteFuncion(toEmail);
+  // console.log(result[0].email_phone);
+  // const emaito = result[0].email_phone;
+
+  // const htmlPlaintext = <></>;
+
+  // var mailOptions = {
+  //   from: "<ismayelhossen124@gmail.com>",
+  //   to: emaito,
+  //   subject: "Yumitto Order Confirmed",
+  //   text: "Plaintext version of the message",
+  //   html: `<p class="btn btn-success">Order Confirmed</p>`,
+  // };
+  // transporter.sendMail(mailOptions, async function (error, info) {
+  //   if (error) {
+  //     console.log(error);
+  //   } else {
+  //     console.log("Email sent: " + info.response);
+  //     console.log("Email accpted: " + info.accepted);
+
+  //     const sql = `update orders set status=1 where cart_orderid=${req.params.orderid} `;
+
+  //     const result = await SqlExecuteFuncion(sql);
+  //     // console.log(result);
+  //     return res.status(200).json({
+  //       success: true,
+  //       data: result,
+  //     });
+  //   }
+  // });
+
   const sql = `update orders set status=1 where cart_orderid=${req.params.orderid} `;
+
   const result = await SqlExecuteFuncion(sql);
   // console.log(result);
   return res.status(200).json({
@@ -451,5 +484,17 @@ ProductRoute.get("/councustomer/get", async function (req, res, next) {
     data: result,
   });
 });
-
+ProductRoute.get("/customer/get/:orderid", async function (req, res, next) {
+  const sql = `select*from orders where cart_orderid=${req.params.orderid} `;
+  const result = await SqlExecuteFuncion(sql);
+  console.log(result[0].email_phone);
+  const email = result[0].email_phone;
+  const sql2 = `select*from customers where email='${email}' `;
+  const result2 = await SqlExecuteFuncion(sql2);
+  console.log(result2);
+  return res.status(200).json({
+    success: true,
+    data: result2,
+  });
+});
 module.exports = ProductRoute;

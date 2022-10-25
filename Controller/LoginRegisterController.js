@@ -228,7 +228,7 @@ LoginRegisterRoute.post("/admin/login", async function (req, res, next) {
 LoginRegisterRoute.post(
   "/customer/facebooklogin",
   async function (req, res, next) {
-    console.log(req.body.picture.data.url);
+    console.log(req.body);
     const { name, email } = req.body;
     const query = `SELECT*FROM customers WHERE email='${email}' `;
     const findUser = await SqlExecuteFuncion(query);
@@ -361,7 +361,7 @@ LoginRegisterRoute.post("/admin/googlelogin", async function (req, res, next) {
     },
     process.env.JWT_TOKEN_SECRET,
     {
-      expiresIn: 6000 * 30,
+      expiresIn: 6000 * 80,
     }
   );
   res
